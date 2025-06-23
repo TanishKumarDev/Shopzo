@@ -3,6 +3,7 @@ import { User } from '../models/user.js';
 import { OTP } from '../models/otp.js';
 import sendOTP from '../utils/sendOTP.js';
 import jwt from 'jsonwebtoken';
+import { isAuth } from '../middlewares/isAuth.js';
 
 export const loginUser = tryCatch(async (req, res) => {
   const { email } = req.body;
@@ -15,7 +16,6 @@ export const loginUser = tryCatch(async (req, res) => {
   }
 
   await sendOTP(email, subject, otp);
-
   await OTP.create({ email, otp });
 
   res.status(200).json({ message: 'OTP sent to your mail' });
@@ -40,4 +40,9 @@ export const verifyUser = tryCatch(async (req, res) => {
     await haveOTP.deleteOne();
     return res.status(200).json({ message: 'User logged in', token, user });
   }
+});
+
+export const myProfile = tryCatch(async (req, res) => {
+  const user = await User.findById(req.user._id);
+  res.status(200).json(user);
 });
