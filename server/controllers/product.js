@@ -1,0 +1,87 @@
+import Product from '../models/product.js';
+import tryCatch from '../utils/tryCatch.js';
+import bufferGenerator from '../utils/bufferGenerator.js';
+import cloudinary from '../utils/cloudinary.js';
+
+
+// Create a new product (Admin only)
+export const createProduct = tryCatch(async (req, res) => {
+  // Check admin access
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ message: 'You are not admin' });
+  }
+
+  const { title, about, category, price, stock } = req.body;
+
+  // Check if images are uploaded
+  if (!req.files || req.files.length === 0) {
+    return res.status(400).json({ message: 'No files to upload' });
+  }
+
+  // Upload all files to Cloudinary
+  const imageUploadPromises = req.files.map(async (file) => {
+    const fileBuffer = bufferGenerator(file);
+    const result = await cloudinary.uploader.upload(fileBuffer.content);
+    return {
+      public_id: result.public_id,
+      url: result.secure_url
+    };
+  });
+
+  const uploadedImages = await Promise.all(imageUploadPromises);
+
+  // Create product with uploaded images
+  const product = await Product.create({
+    title,
+    about,
+    category,
+    price,
+    stock,
+    images: uploadedImages
+  });
+
+  res.status(201).json({ product });
+});
+
+// Get all products with filters & pagination
+export const getAllProducts = tryCatch(async (req, res) => {
+  const { search, category, page = 1, sortByPrice } = req.query;
+  const limit = 8;
+  const filter = {};
+
+  // Apply search filter
+  if (search) {
+    filter.title = { $regex: search, $options: 'i' };
+  }
+
+  // Filter by category
+  if (category) {
+    filter.category = category;
+  }
+
+  // Sorting logic
+  let sortOption = { createdAt: -1 };
+  if (sortByPrice === 'lowToHigh') {
+    sortOption = { price: 1 };
+  } else if (sortByPrice === 'highToLow') {
+    sortOption = { price: -1 };
+  }
+
+  // Get filtered and paginated products
+  const products = await Product.find(filter)
+    .limit(limit)
+    .skip((page - 1) * limit)
+    .sort(sortOption);
+
+  const countProducts = await Product.countDocuments(filter);
+  const totalPages = Math.ceil(countProducts / limit);
+  const distinctCategories = await Product.distinct('category');
+  const newProducts = await Product.find().sort({ createdAt: -1 }).limit(4);
+
+  res.status(200).json({
+    products,
+    categories: distinctCategories,
+    totalPages,
+    newProducts
+  });
+});

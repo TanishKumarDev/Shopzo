@@ -53,3 +53,5 @@ export const myProfile = tryCatch(async (req, res) => {
   const user = await User.findById(req.user._id);
   res.status(200).json({ user });
 });
+
+// 
