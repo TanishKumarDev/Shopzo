@@ -47,3 +47,9 @@ export const verifyUser = tryCatch(async (req, res) => {
 
   res.status(200).json({ message: 'User logged in', token, user });
 });
+
+// controller to fetch the authenticated user’s data.
+export const myProfile = tryCatch(async (req, res) => {
+  const user = await User.findById(req.user._id);
+  res.status(200).json({ user });
+});
