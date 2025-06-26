@@ -127,11 +127,47 @@ export const updateProduct = tryCatch(async (req, res) => {
     updateFields,
     { new: true, runValidators: true }
   );
-
   // Check if product was updated
   if (!updatedProduct) {
     return res.status(404).json({ message: 'Product not found' });
   }
   // Send response
   res.status(200).json({ message: 'Product updated', product: updatedProduct });
+});
+
+// Update product images
+export const updateProductImages = tryCatch(async (req, res) => {
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ message: 'You are not admin' });
+  }
+// Check if images are uploaded
+  const id = req.params.id;
+  if (!req.files || req.files.length === 0) {
+    return res.status(400).json({ message: 'No files to upload' });
+  }
+// Delete old images
+  const product = await Product.findById(id);
+  if (!product) {
+    return res.status(404).json({ message: 'Product not found' });
+  }
+// Delete old images
+  const oldImages = product.images || [];
+  for (const img of oldImages) {
+    await cloudinary.uploader.destroy(img.public_id);
+  }
+// Upload new images
+  const imageUploadPromises = req.files.map(async (file) => {
+    const fileBuffer = bufferGenerator(file);
+    const result = await cloudinary.uploader.upload(fileBuffer.content);
+    return {
+      public_id: result.public_id,
+      url: result.secure_url
+    };
+  });
+// Update product
+  const uploadedImages = await Promise.all(imageUploadPromises);
+  product.images = uploadedImages;
+  await product.save();
+// Send response
+  res.status(200).json({ message: 'Image updated', product });
 });
