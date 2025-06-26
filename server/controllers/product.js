@@ -103,3 +103,35 @@ export const getSingleProduct = tryCatch(async (req, res) => {
 
   res.status(200).json({ product, relatedProducts });
 })
+
+// Update a product
+export const updateProduct = tryCatch(async (req, res) => {
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ message: 'You are not admin' });
+  }
+
+  // Check if product exists
+  const { title, about, category, price, stock } = req.body;
+  const updateFields = {};
+
+  // Update fields
+  if (title) updateFields.title = title;
+  if (about) updateFields.about = about;
+  if (category) updateFields.category = category;
+  if (price) updateFields.price = price;
+  if (stock) updateFields.stock = stock;
+
+  // Update product
+  const updatedProduct = await Product.findByIdAndUpdate(
+    req.params.id,
+    updateFields,
+    { new: true, runValidators: true }
+  );
+
+  // Check if product was updated
+  if (!updatedProduct) {
+    return res.status(404).json({ message: 'Product not found' });
+  }
+  // Send response
+  res.status(200).json({ message: 'Product updated', product: updatedProduct });
+});
