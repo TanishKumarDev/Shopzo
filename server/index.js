@@ -5,7 +5,7 @@ import userRoutes from './routes/user.js';
 import productRoutes from './routes/product.js';
 import cartRoutes from './routes/cart.js';
 import addressRoutes from './routes/address.js';
-
+import orderRoutes from './routes/order.js';
 dotenv.config();
 
 const app = express();
@@ -16,6 +16,8 @@ app.use('/api', userRoutes); // Mount user routes
 app.use('/api', productRoutes); // Mount product routes
 app.use('/api', cartRoutes);
 app.use('/api', addressRoutes);
+app.use('/api', orderRoutes);
+
 connectDB();
 
 app.listen(PORT, () => {
