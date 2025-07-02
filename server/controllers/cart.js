@@ -1,6 +1,6 @@
 import tryCatch from '../utils/tryCatch.js';
 import { Cart } from '../models/Cart.js';
-import Product from '../models/Product.js';
+import Product from '../models/product.js';
 
 // Add a product to the user's cart
 export const addToCart = tryCatch(async (req, res) => {

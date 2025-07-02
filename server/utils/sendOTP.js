@@ -32,7 +32,7 @@ const sendOTP = async (email, subject = "Your OTP for Shopzo Login", otp) => {
   });
 
   if (process.env.NODE_ENV !== 'production') {
-    console.log(`✅ OTP email sent to ${email}`);
+    console.log(`OTP email sent to ${email}`);
   }
 };
 

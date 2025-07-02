@@ -1,7 +1,7 @@
 import tryCatch from '../utils/tryCatch.js';
 import sendOTP from '../utils/sendOTP.js';
 import { User } from '../models/user.js';
-import { OTP } from '../models/otp.js';
+import { OTP } from '../models/OTP.js';
 import jwt from 'jsonwebtoken';
 
 export const loginUser = tryCatch(async (req, res) => {
