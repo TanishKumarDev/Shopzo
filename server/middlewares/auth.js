@@ -13,7 +13,6 @@ export const auth = async (req, res, next) => {
     if (!req.user) {
       return res.status(404).json({ message: 'User not found' });
     }
-
     next();
   } catch (error) {
     res.status(500).json({ message: 'Please login' });

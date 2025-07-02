@@ -13,6 +13,8 @@
   "description": "",
   "dependencies": {
     "cloudinary": "^2.7.0",
+    "cor": "^0.0.0",
+    "cors": "^2.8.5",
     "datauri": "^4.1.0",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
