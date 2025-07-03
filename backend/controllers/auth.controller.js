@@ -1,10 +1,9 @@
-
-export const signup = async (req, res) =>{
-        res.send("signup Auth route");
+export const signup = async (req, res) => {
+    res.send('signup')
 }
-export const login = async (req, res) =>{
-        res.send("login Auth route");
+export const login = async (req, res) => {
+    res.send('login')
 }
-export const logout = async (req, res) =>{
-        res.send("logout Auth route");
+export const logout = async (req, res) => {
+    res.send('logout')
 }

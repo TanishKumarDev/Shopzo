@@ -1,13 +1,10 @@
-import express from "express";
-import sign from "jsonwebtoken";
-import { signup, login, logout } from "../controllers/auth.controller.js";
+import express from 'express'
+import { login, logout, signup } from '../controllers/auth.controller.js'
 
-const routes = express.Router();
+const router = express.Router()
 
-routes.get("/signup", signup);
+router.get('/signup', signup )
+router.get('/login', login )
+router.get('/logout', logout)
 
-routes.get("/login", login);
-
-routes.get("/logout", logout);
-
-export default routes;
+export default router

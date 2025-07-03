@@ -1,27 +1,30 @@
-import express from "express";
-import dotenv from "dotenv";
-import authRoutes from "./routes/auth.route.js";
-import { connectDB } from "./lib/db.js";
+import express from 'express'
+import dotenv from 'dotenv'
 
 // Load environment variables
-dotenv.config();
+dotenv.config()
 
 // Create an Express app
-const app = express();
+const app = express()
 
 // Define the port
-const PORT = process.env.PORT || 3000;
+const port = process.env.PORT || 3000
 
-// Routes
-app.use('/api/auth', authRoutes);
+// Middleware
+app.use(express.json())
+
+// Import routes
+import authRoutes from './routes/auth.route.js'
+
+// Use Routes
+app.use('/api/auth', authRoutes)
 
 // Define a simple route
 app.get('/', (req, res) => {
-  res.send('Backend API is running');
-});
+  res.send('Shopzo Backend is running')
+})
 
 // Start the server
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-  connectDB();
+app.listen(port, () => {
+  console.log(`Server is running on localhost:${port}`)
 })
