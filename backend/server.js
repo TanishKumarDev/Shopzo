@@ -1,5 +1,6 @@
 import express from 'express'
 import dotenv from 'dotenv'
+import connectDB from './lib/db.js'
 
 // Load environment variables
 dotenv.config()
@@ -18,6 +19,9 @@ import authRoutes from './routes/auth.route.js'
 
 // Use Routes
 app.use('/api/auth', authRoutes)
+
+// Connect to MongoDB
+connectDB()
 
 // Define a simple route
 app.get('/', (req, res) => {
