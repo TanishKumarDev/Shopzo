@@ -11,7 +11,7 @@ const app = express()
 // Define the port
 const port = process.env.PORT || 3000
 
-// Middleware
+// Middleware to parse JSON
 app.use(express.json())
 
 // Import routes
