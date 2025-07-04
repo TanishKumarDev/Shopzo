@@ -1,6 +1,8 @@
 import express from 'express'
 import dotenv from 'dotenv'
 import connectDB from './lib/db.js'
+import cookieParser from 'cookie-parser';
+
 
 // Load environment variables
 dotenv.config()
@@ -13,6 +15,9 @@ const port = process.env.PORT || 3000
 
 // Middleware to parse JSON
 app.use(express.json())
+
+// Middleware to parse cookies
+app.use(cookieParser());
 
 // Import routes
 import authRoutes from './routes/auth.route.js'
