@@ -2,7 +2,7 @@ import express from 'express'
 import dotenv from 'dotenv'
 import connectDB from './lib/db.js'
 import cookieParser from 'cookie-parser';
-
+import cartRoutes from './routes/cart.route.js'
 
 // Load environment variables
 dotenv.config()
@@ -26,6 +26,7 @@ import productRoutes from './routes/product.route.js'
 // Use Routes
 app.use('/api/auth', authRoutes)
 app.use('/api/products', productRoutes)
+app.use("/api/cart", cartRoutes);
 
 // Connect to MongoDB
 connectDB()
