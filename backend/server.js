@@ -21,9 +21,11 @@ app.use(cookieParser());
 
 // Import routes
 import authRoutes from './routes/auth.route.js'
+import productRoutes from './routes/product.route.js'
 
 // Use Routes
 app.use('/api/auth', authRoutes)
+app.use('/api/products', productRoutes)
 
 // Connect to MongoDB
 connectDB()
