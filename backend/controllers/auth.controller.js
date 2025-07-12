@@ -2,14 +2,14 @@ import jwt from "jsonwebtoken";
 import User from "../models/user.model.js";
 import RefreshToken from "../models/refreshToken.model.js";
 
-// Middleware
+// Middleware: Protect Route (Login Required)
+// Checks accessToken in cookies → verifies JWT → fetches user
+// Used to protect routes like /api/cart, /api/orders, etc.
 export const protectRoute = async (req, res, next) => {
   try {
     const accessToken = req.cookies.accessToken;
     if (!accessToken) {
-      return res
-        .status(401)
-        .json({ message: "Unauthorized - No access token" });
+      return res.status(401).json({ message: "Unauthorized - No access token" });
     }
 
     const decoded = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET);
@@ -27,7 +27,10 @@ export const protectRoute = async (req, res, next) => {
   }
 };
 
-// Token Generation
+// Utility: Generate Access & Refresh Tokens
+// Creates both accessToken (15m) and refreshToken (7d)
+// accessToken: Short-lived (15m)
+// refreshToken: Long-lived (7d) to re-authenticate silently
 const generateTokens = (userId) => {
   const accessToken = jwt.sign({ userId }, process.env.ACCESS_TOKEN_SECRET, {
     expiresIn: "15m",
@@ -40,19 +43,24 @@ const generateTokens = (userId) => {
   return { accessToken, refreshToken };
 };
 
-// Store Refresh Token in DB
+// Utility: Save Refresh Token in DB
+// Saves refresh token to DB (for logout and validation)
+// Helps in: Invalidating token on logout, Validating token during refresh
 const storeRefreshToken = async (userId, refreshToken) => {
   await RefreshToken.create({ user: userId, token: refreshToken });
 };
 
-// Set Tokens as Secure Cookies
+// Utility: Set Access & Refresh Tokens as HTTP-only Cookies
+// Sends both tokens as HTTP-only secure cookies
+// httpOnly + secure + sameSite = Prevents token theft from JS
 const setCookies = (res, accessToken, refreshToken) => {
   res.cookie("accessToken", accessToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "strict",
-    maxAge: 15 * 60 * 1000, // 15 mins
+    maxAge: 15 * 60 * 1000, // 15 minutes
   });
+
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
@@ -61,11 +69,14 @@ const setCookies = (res, accessToken, refreshToken) => {
   });
 };
 
-// Signup
+// Controller: Signup a New User
+// Checks if user exists → creates new user → generates & stores tokens → sends response
 export const signup = async (req, res) => {
   const { email, password, name } = req.body;
+
   try {
     const userExists = await User.findOne({ email });
+
     if (userExists) {
       return res.status(400).json({ message: "User already exists" });
     }
@@ -88,41 +99,46 @@ export const signup = async (req, res) => {
   }
 };
 
-// Login
+// Controller: Login User
+// Checks credentials → generates tokens → stores refresh → sets cookies
+// Both login and signup reuse the same token logic
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
+
     const user = await User.findOne({ email });
 
-    if (user && (await user.comparePassword(password))) {
-      const { accessToken, refreshToken } = generateTokens(user._id);
-      await storeRefreshToken(user._id, refreshToken);
-      setCookies(res, accessToken, refreshToken);
+    const isPasswordCorrect = user && (await user.comparePassword(password));
 
-      res.json({
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-      });
-    } else {
-      res.status(400).json({ message: "Invalid email or password" });
+    if (!isPasswordCorrect) {
+      return res.status(400).json({ message: "Invalid email or password" });
     }
+
+    const { accessToken, refreshToken } = generateTokens(user._id);
+    await storeRefreshToken(user._id, refreshToken);
+    setCookies(res, accessToken, refreshToken);
+
+    res.json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+    });
   } catch (error) {
     console.log("Error in login controller", error.message);
     res.status(500).json({ message: error.message });
   }
 };
 
-// Logout
+// Controller: Logout User
+// Deletes refresh token from DB → clears both cookies
+// You can’t just clear the frontend cookie — you also need to remove the token from DB so it can't be reused.
 export const logout = async (req, res) => {
   try {
     const refreshToken = req.cookies.refreshToken;
+
     if (refreshToken) {
-      const decoded = jwt.verify(
-        refreshToken,
-        process.env.REFRESH_TOKEN_SECRET
-      );
+      const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
       await RefreshToken.deleteOne({ token: refreshToken });
     }
 
@@ -136,10 +152,13 @@ export const logout = async (req, res) => {
   }
 };
 
-//  Refresh Token
+// Controller: Refresh Access Token using Refresh Token
+// Validates refresh token → issues new access token → sends it
+// Called silently when accessToken expires
 export const refreshToken = async (req, res) => {
   try {
     const refreshToken = req.cookies.refreshToken;
+
     if (!refreshToken) {
       return res.status(401).json({ message: "No refresh token provided" });
     }
@@ -171,7 +190,8 @@ export const refreshToken = async (req, res) => {
   }
 };
 
-// Get Profile
+// Controller: Get Authenticated User Profile
+// Returns req.user set by protectRoute
 export const getProfile = async (req, res) => {
   try {
     res.json(req.user);
@@ -179,3 +199,4 @@ export const getProfile = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+
