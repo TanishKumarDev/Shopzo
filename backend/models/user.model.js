@@ -42,7 +42,7 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-// Pre-save hook to hash password before saving to database
+// Pre-save hook to hash password before saving to database -  advanced Mongoose syntax 
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
 
@@ -63,3 +63,4 @@ userSchema.methods.comparePassword = async function (password) {
 const User = mongoose.model("User", userSchema);
 
 export default User;
+
