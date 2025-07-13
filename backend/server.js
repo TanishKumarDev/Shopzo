@@ -45,13 +45,12 @@ app.use(express.json({ limit: "10mb" })); // Middleware to parse inccoming JSON 
 app.use(cookieParser()); // Middleware to parse cookies from client requests
 
 // Route Mounted 
-app.use("/api/auth", authRoute);
-app.use("/api/products", productRoute);
-app.use("/api/cart", cartRoute);
-app.use("/api/coupons", couponRoute);
-app.use("/api/payments", paymentRoute);
-app.use("/api/analytics", analyticsRoute);
-
+app.use("/api/auth", authRoute);         // Login, Register, Logout etc.
+app.use("/api/products", productRoute);  // All product-related APIs
+app.use("/api/cart", cartRoute);         // Cart operations
+app.use("/api/coupons", couponRoute);    // Coupon CRUD and apply
+app.use("/api/payments", paymentRoute);  // Stripe/Payment APIs
+app.use("/api/analytics", analyticsRoute); // Admin sales/visits reports
 
 // Serve frontend in production
 if(process.env.NODE_ENV == "production"){
