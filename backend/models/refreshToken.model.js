@@ -1,9 +1,9 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const refreshTokenSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+    ref: "User",
     required: true,
   },
   token: {
@@ -13,9 +13,8 @@ const refreshTokenSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now,
-    expires: '7d', // TTl of 7 days
+    expires: "7d", // TTl of 7 days
   },
 });
 
-export default mongoose.model('RefreshToken', refreshTokenSchema);
-
+export default mongoose.model("RefreshToken", refreshTokenSchema);
