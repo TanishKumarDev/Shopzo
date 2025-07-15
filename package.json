@@ -1,0 +1,22 @@
+{
+  "name": "shopzo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "nodemon backend/server.js",
+    "start": "node backend/server.js",
+    "build": "npm install && npm run install --prefix frontend && npm run build --prefix frontend"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TanishKumarDev/Shopzo.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/TanishKumarDev/Shopzo/issues"
+  },
+  "homepage": "https://github.com/TanishKumarDev/Shopzo#readme"
+}
