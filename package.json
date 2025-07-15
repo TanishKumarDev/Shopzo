@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "nodemon backend/server.js",
-    "start": "node backend/server.js",
-    "build": "npm install && npm install --prefix frontend && npm run build --prefix frontend"
+  "test": "nodemon backend/server.js",
+  "start": "node backend/server.js",
+  "build": "npm install && npm install --prefix frontend && npm run build --prefix frontend && npm install --prefix backend"
   },
   "repository": {
     "type": "git",
